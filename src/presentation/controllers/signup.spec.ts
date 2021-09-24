@@ -1,5 +1,6 @@
 import { SignUpController } from './signup'
 import { MissingParamError } from '../errors/missingParamError'
+import { BusinessError } from '../errors/businessError'
 
 describe('Signup controller', () => {
   test('Should return 400 if no name provided', () => {
@@ -56,5 +57,20 @@ describe('Signup controller', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('passwordConfirmation'))
+  })
+
+  test("Should return 400 if passwords doesn't match", () => {
+    const sut = new SignUpController()
+    const httpRequest = {
+      body: {
+        name: 'some',
+        email: 'some@email.com',
+        password: 'some_pwd',
+        passwordConfirmation: 'other_pwd'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new BusinessError('passwords doesn`t mactch'))
   })
 })
