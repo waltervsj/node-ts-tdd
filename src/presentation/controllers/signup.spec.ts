@@ -1,13 +1,29 @@
 import { SignUpController } from './signup'
-import { MissingParamError } from '../errors/missingParamError'
-import { BusinessError } from '../errors/businessError'
-import { Controller } from '../protocols/controller'
-import { InvalidParamError } from '../errors/invalidParamError'
+import { Controller } from '../protocols'
 import { MyValidator } from '../helpers/myValidator'
-import { ValidationError } from '../errors/validationError'
+import { ValidationError, MissingParamError, BusinessError } from '../errors'
+import { AccountModel } from '../../domain/models/account'
+import { AddAccount, AddAccountModel } from '../../domain/usecases/addAccount'
 
 const makeSut = (): Controller => {
-  return new SignUpController(new MyValidator())
+  const validator = new MyValidator()
+  const addAccountStub = makeAddAccount()
+  return new SignUpController(validator, addAccountStub)
+}
+
+const makeAddAccount = (): AddAccount => {
+  class AddAccountStub implements AddAccount {
+    add (account: AddAccountModel): AccountModel {
+      return {
+        id: 'valid_id',
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+  }
+
+  return new AddAccountStub()
 }
 
 describe('Signup controller', () => {
@@ -108,5 +124,25 @@ describe('Signup controller', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new ValidationError(`email '${httpRequest.body.email}' is not valid`))
+  })
+
+  test('Should return 500 if exception occour', () => {
+    const sut = makeSut()
+    const httpResponse = sut.handle({})
+    expect(httpResponse.statusCode).toBe(500)
+  })
+
+  test('Should return 200 if success', () => {
+    const sut = makeSut()
+    const httpRequest = {
+      body: {
+        name: 'some',
+        email: 'email@email.com',
+        password: 'some_pwd',
+        passwordConfirmation: 'some_pwd'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
   })
 })
