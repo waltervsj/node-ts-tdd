@@ -1,3 +1,3 @@
-export * from './businessError'
-export * from './missingParamError'
-export * from './validationError'
+export * from './business-error'
+export * from './missing-param-error'
+export * from './validation-error'

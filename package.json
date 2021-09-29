@@ -27,6 +27,6 @@
     "test:staged": "jest --passWithNoTests --findRelatedTests /src/*",
     "test:unit": "yarn test -- --watch -c jest.unit.config.ts",
     "test:integration": "yarn test -- --watch -c jest.integration.config.ts",
-    "test:ci": "yarn test -- --passWithNoTests --coverage"
+    "test:ci": "yarn test --passWithNoTests --coverage"
   }
 }
