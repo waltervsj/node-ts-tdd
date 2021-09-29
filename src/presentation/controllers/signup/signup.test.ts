@@ -1,9 +1,9 @@
-import { SignUpController } from './signup'
-import { Controller } from '../protocols'
-import { MyValidator } from '../helpers/myValidator'
-import { ValidationError, MissingParamError, BusinessError } from '../errors'
-import { AccountModel } from '../../domain/models/account'
-import { AddAccount, AddAccountModel } from '../../domain/usecases/addAccount'
+import { SignUpController } from '.'
+import { Controller } from '../../protocols'
+import { MyValidator } from '../../helpers/myValidator'
+import { ValidationError, MissingParamError, BusinessError } from '../../errors'
+import { AccountModel } from '../../../domain/models/account'
+import { AddAccount, AddAccountModel } from '../../../domain/usecases/addAccount'
 
 const makeSut = (): Controller => {
   const validator = new MyValidator()
@@ -13,13 +13,14 @@ const makeSut = (): Controller => {
 
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
-    add (account: AddAccountModel): AccountModel {
-      return {
+    async add (account: AddAccountModel): Promise<AccountModel> {
+      const fakeAccount = {
         id: 'valid_id',
         name: 'valid_name',
         email: 'valid_email@mail.com',
         password: 'valid_password'
       }
+      return await new Promise(resolve => resolve(fakeAccount))
     }
   }
 
@@ -27,7 +28,7 @@ const makeAddAccount = (): AddAccount => {
 }
 
 describe('Signup controller', () => {
-  test('Should return 400 if no name provided', () => {
+  test('Should return 400 if no name provided', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -36,12 +37,12 @@ describe('Signup controller', () => {
         passwordConfirmation: 'some_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('name'))
   })
 
-  test('Should return 400 if no email is provided', () => {
+  test('Should return 400 if no email is provided', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -50,12 +51,12 @@ describe('Signup controller', () => {
         passwordConfirmation: 'some_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('email'))
   })
 
-  test('Should return 400 if no password is provided', () => {
+  test('Should return 400 if no password is provided', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -64,12 +65,12 @@ describe('Signup controller', () => {
         passwordConfirmation: 'some_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('password'))
   })
 
-  test('Should return 400 if no passwordConfirmation is provided', () => {
+  test('Should return 400 if no passwordConfirmation is provided', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -78,12 +79,12 @@ describe('Signup controller', () => {
         password: 'some_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('passwordConfirmation'))
   })
 
-  test('Should return 400 if no password and passwordConfirmation is provided', () => {
+  test('Should return 400 if no password and passwordConfirmation is provided', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -91,12 +92,12 @@ describe('Signup controller', () => {
         email: 'some@email.com'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('password, passwordConfirmation'))
   })
 
-  test("Should return 400 if passwords doesn't match", () => {
+  test("Should return 400 if passwords doesn't match", async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -106,12 +107,12 @@ describe('Signup controller', () => {
         passwordConfirmation: 'other_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new BusinessError("passwords doesn't mactch"))
   })
 
-  test('Should return 400 if and invalid email is provided', () => {
+  test('Should return 400 if and invalid email is provided', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -121,18 +122,18 @@ describe('Signup controller', () => {
         passwordConfirmation: 'some_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new ValidationError(`email '${httpRequest.body.email}' is not valid`))
   })
 
-  test('Should return 500 if exception occour', () => {
+  test('Should return 500 if exception occour', async () => {
     const sut = makeSut()
-    const httpResponse = sut.handle({})
+    const httpResponse = await sut.handle({})
     expect(httpResponse.statusCode).toBe(500)
   })
 
-  test('Should return 200 if success', () => {
+  test('Should return 200 if success', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -142,7 +143,7 @@ describe('Signup controller', () => {
         passwordConfirmation: 'some_pwd'
       }
     }
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
   })
 })

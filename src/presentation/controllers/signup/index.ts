@@ -1,7 +1,7 @@
-import { AddAccount } from '../../domain/usecases/addAccount'
-import { MissingParamError, BusinessError, ValidationError } from '../errors'
-import { badRequest } from '../helpers/httpHelper'
-import { HttpRequest, HttpResponse, Controller, Validator } from '../protocols'
+import { AddAccount } from '../../../domain/usecases/addAccount'
+import { MissingParamError, BusinessError, ValidationError } from '../../errors'
+import { badRequest, success } from '../../helpers/httpHelper'
+import { HttpRequest, HttpResponse, Controller, Validator } from '../../protocols'
 export class SignUpController implements Controller {
   private readonly validator: Validator
   private readonly addAccount: AddAccount
@@ -11,7 +11,7 @@ export class SignUpController implements Controller {
     this.addAccount = addAccount
   }
 
-  handle (request: HttpRequest): HttpResponse {
+  async handle (request: HttpRequest): Promise<HttpResponse> {
     try {
       const errors = this.validator.isFilled(request.body, 'name', 'email', 'password', 'passwordConfirmation')
       if (errors.length) {
@@ -28,16 +28,13 @@ export class SignUpController implements Controller {
         return badRequest(new ValidationError(`email '${email as string}' is not valid`))
       }
 
-      const newAccount = this.addAccount.add({
+      const newAccount = await this.addAccount.add({
         name,
         email,
         password
       })
 
-      return {
-        statusCode: 200,
-        body: newAccount
-      }
+      return success(newAccount)
     } catch (error) {
       return {
         statusCode: 500,

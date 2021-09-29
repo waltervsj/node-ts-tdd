@@ -7,13 +7,11 @@ export class MyValidator implements Validator {
   }
 
   isFilled (fields: any, ...requiredFields: string[]): string[] {
-    const errors = requiredFields.filter(requiredField => {
+    return requiredFields.filter(requiredField => {
       if (!fields[requiredField]) {
         return requiredField
       }
       return false
     })
-
-    return errors || []
   }
 }
