@@ -24,7 +24,7 @@
   "scripts": {
     "test": "jest --passWithNoTests --silent --noStackTrace --runInBand",
     "test:verbose": "jest --passWithNoTests --runInBand",
-    "test:staged": "jest -- --passWithNoTests --findRelatedTests",
+    "test:staged": "jest --passWithNoTests --findRelatedTests /src/*",
     "test:unit": "yarn test -- --watch -c jest.unit.config.ts",
     "test:integration": "yarn test -- --watch -c jest.integration.config.ts",
     "test:ci": "yarn test -- --passWithNoTests --coverage"
