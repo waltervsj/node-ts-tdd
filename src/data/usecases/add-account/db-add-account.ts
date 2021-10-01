@@ -10,16 +10,21 @@ export class DBAddAccount implements AddAccount {
   }
 
   async add (account: AddAccountModel): Promise<AccountModel> {
-    let { name, email, password } = account
-    password = await this.encrypter.encrypt(password)
+    try {
+      let { name, email, password } = account
+      password = await this.encrypter.encrypt(password)
 
-    const accountModel: AccountModel = {
-      id: '',
-      name,
-      email,
-      password
+      const accountModel: AccountModel = {
+        id: '',
+        name,
+        email,
+        password
+      }
+
+      return await Promise.resolve(accountModel)
+    } catch (error) {
+      console.error(error)
+      throw error
     }
-
-    return await Promise.resolve(accountModel)
   }
 }
