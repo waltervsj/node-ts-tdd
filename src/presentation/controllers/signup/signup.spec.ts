@@ -1,6 +1,6 @@
 import { SignUpController } from '.'
 import { Controller } from '../../protocols'
-import { MyValidator } from '../../helpers/my-validator'
+import { MyValidator } from '../../../utils/my-validator'
 import { ValidationError, MissingParamError, BusinessError } from '../../errors'
 import { AccountModel } from '../../../domain/models/account'
 import { AddAccount, AddAccountModel } from '../../../domain/usecases/add-account'

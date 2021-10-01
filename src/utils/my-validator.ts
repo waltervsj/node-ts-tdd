@@ -1,4 +1,4 @@
-import { Validator } from '../protocols/validator'
+import { Validator } from '../presentation/protocols/validator'
 
 export class MyValidator implements Validator {
   isValidMail (email: string): boolean {
@@ -8,10 +8,7 @@ export class MyValidator implements Validator {
 
   isFilled (fields: any, ...requiredFields: string[]): string[] {
     return requiredFields.filter(requiredField => {
-      if (!fields[requiredField]) {
-        return requiredField
-      }
-      return false
+      return !fields[requiredField] ? requiredField : false
     })
   }
 }
